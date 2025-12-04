@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Architect Suite v1.4 - Edición Cani Barna</title>
+    <title>Prompt Architect Suite v1.6 - Edición Cani Barna</title>
     
     <!-- Tailwind CSS (Estilos tochos) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -46,11 +46,8 @@
         body { background-color: #0c0c0c; color: #e5e5e5; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         pre { background-color: #111; border: 1px solid #333; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; }
-        /* Sliders tuneados */
         input[type=range] { @apply h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer; }
         input[type=range]::-webkit-slider-thumb { @apply appearance-none w-4 h-4 rounded-full bg-purple-500 border-2 border-purple-300 shadow-lg mt-0; }
-        
-        /* Tipografía Custom */
         .prose-custom h1 { @apply text-3xl font-bold mb-4 text-purple-400; }
         .prose-custom h2 { @apply text-2xl font-bold mt-8 mb-4 text-purple-300; }
         .prose-custom h3 { @apply text-xl font-bold mt-6 mb-2 text-purple-200; }
@@ -68,15 +65,21 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- DATA: CONTENIDO DE LOS ARCHIVOS PARA DESCARGAR ---
+        // --- 1. CONTENIDO REAL DE LOS ARCHIVOS (YA NO ESTÁN TRUNCADOS) ---
         const FILE_CONTENTS = {
-            trends_script: `import requests\nimport json\nimport datetime\n\n# CONFIGURACIÓN TOCHA\nHF_API_URL = "https://huggingface.co/api/models"\nLIMIT = 10\nTAGS = ["gguf"]\n\ndef pillar_modelos_top():\n    # ... (Código completo del script fetch_trends_cani.py) ...\n    print("Script ejecutado, tete.")\n`,
-            gemini_script: `import requests\nimport json\nimport os\n\ndef pillar_modelos_gemini():\n    # ... (Código completo del script fetch_gemini_models_cani.py) ...\n    print("Modelos pillados.")\n`,
-            bundler_script: `import os\nimport requests\n\n# ... (Código completo del script offline_bundler_cani.py) ...\n`,
-            context_json: `{\n  "project_metadata": { "name": "Prompt Architect Suite (Barna Ed.)" },\n  "core_philosophy": { "gentoo_approach": "Minimalismo radical." }\n}`,
-            manual_basic: `# La Suite del Arquitecto: Manual de Bolsillo\n\n## 1. De qué va la vaina\nEsto es una colección de Personas...`,
-            manual_full: `# La Suite del Arquitecto: Documentación Full (Versión 1.3.1)\n\n## 1. La Movida\nEsto es una SPA...`,
-            annex_tech: `# Anexo Técnico: La Chicha\n\n## 1. Herramientas\nAquí tienes los detalles técnicos...`
+            trends_script: `import requests\nimport json\nimport datetime\n\n# CONFIGURACIÓN TOCHA\nHF_API_URL = "https://huggingface.co/api/models"\nLIMIT = 10\nTAGS = ["gguf"]\n\ndef pillar_modelos_top():\n    params = {"sort": "downloads", "direction": "-1", "limit": LIMIT, "filter": "gguf", "full": "true"}\n    print(f"[*] Ojo, preguntando a Hugging Face por los {LIMIT} modelos más tochos...")\n    try:\n        response = requests.get(HF_API_URL, params=params)\n        response.raise_for_status()\n        models = response.json()\n        recomendaciones = []\n        for m in models:\n            model_id = m.get('modelId', 'Ni idea')\n            likes = m.get('likes', 0)\n            downloads = m.get('downloads', 0)\n            desc = f"Modelo GGUF top con {downloads:,} descargas."\n            recomendaciones.append({"keyword": model_id.split('/')[-1], "title": model_id, "text": desc, "stats": f"⭐ {likes} | ⬇️ {downloads}"})\n        output = {"updated_at": datetime.datetime.now().isoformat(), "source": "HF API", "data": recomendaciones}\n        print(json.dumps(output, indent=2))\n        with open("recommendations.json", "w") as f: f.write(json.dumps(output, indent=2))\n        print("\\n[*] Guardao en recommendations.json, merci.")\n    except Exception as e: print(f"[LIADA] {e}")\n\nif __name__ == "__main__": pillar_modelos_top()`,
+
+            gemini_script: `import requests\nimport json\nimport datetime\nimport getpass\nimport os\n\ndef pillar_modelos_gemini():\n    api_key = os.environ.get("GEMINI_API_KEY")\n    if not api_key: api_key = getpass.getpass("Pásame la Key de Google: ")\n    if not api_key: return\n    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}"\n    print("[*] Llamando a Google...")\n    try:\n        response = requests.get(url)\n        data = response.json()\n        if "models" not in data: return\n        recomendaciones = []\n        for m in data["models"]:\n            name = m.get("name", "").replace("models/", "")\n            if "gemini" in name.lower() and "generateContent" in m.get("supportedGenerationMethods", []):\n                recomendaciones.append({"keyword": name, "title": m.get("displayName", name), "text": m.get("description", ""), "stats": f"Input: {m.get('inputTokenLimit',0)}"})\n        output = {"updated_at": datetime.datetime.now().isoformat(), "source": "Google API", "data": recomendaciones}\n        print(json.dumps(output, indent=2))\n        with open("gemini_models.json", "w") as f: f.write(json.dumps(output, indent=2))\n        print(f"\\n[*] Guardao.")\n    except Exception as e: print(f"[ERROR] {e}")\n\nif __name__ == "__main__": pillar_modelos_gemini()`,
+
+            bundler_script: `import os\nimport requests\n\nINPUT_HTML = "prompt_architect_app_cani.html"\nOUTPUT_DIR = "offline_dist"\nLIBS_DIR = "libs"\nDEPENDENCIES = {\n    "https://cdn.tailwindcss.com": "tailwindcss.js",\n    "https://unpkg.com/react@18/umd/react.development.js": "react.development.js",\n    "https://unpkg.com/react-dom@18/umd/react-dom.development.js": "react-dom.development.js",\n    "https://unpkg.com/@babel/standalone/babel.min.js": "babel.min.js",\n    "https://unpkg.com/lucide@latest": "lucide.js"\n}\n\ndef main():\n    if not os.path.exists(INPUT_HTML):\n        print(f"[!] No encuentro {INPUT_HTML}")\n        return\n    if not os.path.exists(os.path.join(OUTPUT_DIR, LIBS_DIR)): os.makedirs(os.path.join(OUTPUT_DIR, LIBS_DIR))\n    print(f"=== Modo Búnker ===")\n    for url, filename in DEPENDENCIES.items():\n        print(f"[*] Bajando {url}...")\n        try:\n            r = requests.get(url)\n            with open(os.path.join(OUTPUT_DIR, LIBS_DIR, filename), 'wb') as f: f.write(r.content)\n        except: print(f"[!] Error bajando {url}")\n\n    with open(INPUT_HTML, 'r', encoding='utf-8') as f: content = f.read()\n    for url, filename in DEPENDENCIES.items():\n        content = content.replace(url, f"./{LIBS_DIR}/{filename}")\n    with open(os.path.join(OUTPUT_DIR, "index_offline.html"), 'w', encoding='utf-8') as f: f.write(content)\n    print("\\n[TRIUNFADA] Ya lo tienes en offline_dist/")\n\nif __name__ == "__main__": main()`,
+
+            context_json: `{\n  "project_metadata": {\n    "name": "Prompt Architect Suite (Barna Ed.)",\n    "version": "1.6",\n    "type": "SPA / Zero-Build"\n  },\n  "core_philosophy": {\n    "gentoo": "Minimalismo. Nada de node_modules.",\n    "socratic": "Gap Analysis antes de generar.",\n    "privacy": "Todo en el navegador."\n  },\n  "dev_instructions": "Eres el Jefe. No uses npm. Mantén todo en un archivo HTML monolítico."\n}`,
+            
+            manual_basic: `# La Suite del Arquitecto: Manual de Bolsillo\n\n## 1. De qué va la vaina\nEsto es una colección de Personas (máscaras pa' la IA) diseñadas para convertir un modelo tonto en un Consultor Senior.\n\n## 2. Cómo chuta\n1. Elige persona en el Vault.\n2. Vete al Simulador.\n3. Contesta las preguntas.\n4. Copia el prompt final.`,
+            
+            manual_full: `# La Suite del Arquitecto: Documentación Full\n\n## 1. Abstract\nUna SPA Zero-Build para ingeniería de prompts socrática. Funciona en local o nube.\n\n## 2. Configuración OLLAMA\nPara usar Ollama local, necesitas listar los modelos.\n\n### Comandos clave:\n- \`ollama list\`: Ver qué tienes instalado.\n- \`ollama pull llama3\`: Bajarte uno nuevo.\n- \`OLLAMA_ORIGINS="*" ollama serve\`: **OBLIGATORIO** para que el navegador pueda hablar con tu PC.`,
+            
+            annex_tech: `# Anexo Técnico\n\n## 1. Arquitectura\nHTML5 + Babel Standalone + React. Sin build steps.\n\n## 2. Persistencia\nUsa localStorage para guardar la API Key si el usuario quiere.`
         };
 
         // --- DATA: CATALOGO DE DESCARGAS ---
@@ -95,26 +98,25 @@
             gemini: {
                 title: "Gemini / Nube Tocha",
                 desc: "Piensa mazo, XML, Razonamiento profundo.",
-                code: `# IDENTIDAD: EL TETE BOSS (Cloud Edition)\nEres el **Puto Arquitecto Senior de Prompts**...`
+                code: `# IDENTIDAD: EL TETE BOSS (Cloud Edition)\nEres el **Puto Arquitecto Senior de Prompts**...\n\n# PROTOCOLO OPERATIVO\n1. Guipar\n2. Olerse la tostada\n3. Interrogatorio\n4. Cocinar\n5. Pulir`
             },
             mid: {
                 title: "Peso Medio (20-30B)",
                 desc: "Estructurado, Socrático. Pa' Llama-3-70B.",
-                code: `# ROL\nActúa como un **Ingeniero de Prompts Senior**...`
+                code: `# ROL\nActúa como un **Ingeniero de Prompts Senior**...\n\n# REGLAS\n1. Modo Socrático\n2. Vocabulario Pro`
             },
             light: {
                 title: "Peso Pluma (<14B)",
                 desc: "Estricto, con bullets. Pa' Mistral/Llama-8B.",
-                code: `# INSTRUCCIÓN DEL SISTEMA\nEres un **Experto en Ingeniería**...`
+                code: `# INSTRUCCIÓN DEL SISTEMA\nEres un **Experto en Ingeniería**...\n\n# PROTOCOLO (ESTRICTO)\n1. QUIETO PARAO\n2. PREGUNTA\n3. DALE CAÑA`
             },
             tiny: {
                 title: "Micro Modelos (<4B)",
                 desc: "Pseudo-código pa' Phi-3/Gemma-2B.",
-                code: `# IDENTIDAD\nRol: Ingeniero de Prompts Pro...`
+                code: `# IDENTIDAD\nRol: Ingeniero de Prompts Pro...\n# ALGORITMO\nIF vaga THEN preguntar ELSE generar`
             }
         };
 
-        // --- CONFIG POR DEFECTO ---
         const DEFAULT_CONFIG = {
             provider: "gemini", 
             apiKey: "",
@@ -130,14 +132,13 @@
 
         const DEFAULT_KB = [
             { keyword: "temperature", title: "Temperatura (T)", text: "Controla el caos. T baja (0.1) pa' código. T alta (1.0) pa' ponerse creativo." },
-            { keyword: "ollama", title: "Ollama CORS (Importante)", text: "Si usas Ollama en local, tienes que lanzarlo con OLLAMA_ORIGINS=\"*\" o el navegador te corta el rollo." },
-            { keyword: "gemini-3", title: "Gemini 3.0 (Preview)", text: "El motor de razonamiento nueva gen. Una bestia pa' contextos largos." },
-            { keyword: "gemini-2.5", title: "Gemini 2.5 (Flash)", text: "El estándar actual. Rápido y ve fotos. Multimodal a tope." }
+            { keyword: "ollama", title: "Ollama CORS", text: "Lanza Ollama con OLLAMA_ORIGINS=\"*\" o no rula." },
+            { keyword: "gemini-3", title: "Gemini 3.0 (Preview)", text: "Nueva gen. Bestia parda." },
+            { keyword: "gemini-2.5", title: "Gemini 2.5 (Flash)", text: "Estándar actual. Rápido." }
         ];
 
         // --- COMPONENTES ---
 
-        // 1. Sidebar
         const Sidebar = ({ activeTab, setActiveTab }) => {
             const menuItems = [
                 { id: 'manual', icon: 'BookOpen', label: 'El Manual' },
@@ -146,109 +147,51 @@
                 { id: 'downloads', icon: 'Package', label: 'Suministros' },
                 { id: 'assistant', icon: 'Bot', label: 'Asistente Docs' },
             ];
-
             return (
                 <div className="w-64 bg-gentoo-sidebar flex flex-col h-full border-r border-gray-800">
                     <div className="p-6">
-                        <h1 className="text-xl font-bold text-gentoo-accent tracking-tighter">
-                            PROMPT<span className="text-white">ARCHITECT</span>
-                        </h1>
-                        <p className="text-xs text-gray-500 mt-1">v1.4 full-equipe</p>
+                        <h1 className="text-xl font-bold text-gentoo-accent tracking-tighter">PROMPT<span className="text-white">ARCHITECT</span></h1>
+                        <p className="text-xs text-gray-500 mt-1">v1.6 ollama-fix</p>
                     </div>
                     <nav className="flex-1 px-4 space-y-2">
                         {menuItems.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => setActiveTab(item.id)}
-                                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
-                                    activeTab === item.id 
-                                    ? 'bg-purple-900/30 text-purple-400 border border-purple-900/50' 
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                                }`}
-                            >
-                                <i data-lucide={item.icon}></i>
-                                <span className="font-mono text-sm">{item.label}</span>
+                            <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${activeTab === item.id ? 'bg-purple-900/30 text-purple-400 border border-purple-900/50' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}>
+                                <i data-lucide={item.icon}></i><span className="font-mono text-sm">{item.label}</span>
                             </button>
                         ))}
                     </nav>
-                    <div className="p-4 border-t border-gray-800">
-                         <button
-                            onClick={() => setActiveTab('settings')}
-                            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
-                                activeTab === 'settings' 
-                                ? 'bg-gray-800 text-white border border-gray-700' 
-                                : 'text-gray-500 hover:bg-gray-800 hover:text-gray-300'
-                            }`}
-                        >
-                            <i data-lucide="Settings"></i>
-                            <span className="font-mono text-sm">Configuración</span>
-                        </button>
-                    </div>
+                    <div className="p-4 border-t border-gray-800"><button onClick={() => setActiveTab('settings')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${activeTab === 'settings' ? 'bg-gray-800 text-white border border-gray-700' : 'text-gray-500 hover:bg-gray-800 hover:text-gray-300'}`}><i data-lucide="Settings"></i><span className="font-mono text-sm">Configuración</span></button></div>
                 </div>
             );
         };
 
-        // 2. Manual View (ARREGLADO Y FULL)
         const ManualView = () => (
             <div className="p-8 max-w-4xl mx-auto prose-custom overflow-y-auto h-full pb-24">
                 <h1>El Manual del Arquitecto (Edición Barna)</h1>
-                <p>Bienvenido, tete. Aquí no se viene a jugar, se viene a currar. Esta suite convierte tu IA en un <strong>Consultor Senior de Ingeniería de Prompts</strong>.</p>
-                
+                <p>Bienvenido, tete. Aquí no se viene a jugar, se viene a currar.</p>
                 <h2>1. ¿De qué va la vaina?</h2>
-                <p>La mayoría de la peña no sabe pedirle cosas a la IA. Le dicen "hazme esto" y la IA les da basura. Nosotros usamos <strong>Meta-Prompts Socráticos</strong>. ¿Qué es eso? Pues que la IA te hace un tercer grado antes de mover un dedo.</p>
-                
-                <h2>2. Cómo chuta esto (Workflow)</h2>
+                <p>La mayoría de la peña no sabe pedirle cosas a la IA. Nosotros usamos <strong>Meta-Prompts Socráticos</strong>.</p>
+                <h2>2. Configuración OLLAMA</h2>
+                <p>Pa' que esto chute en local:</p>
                 <ol className="list-decimal list-inside space-y-2 mb-4 text-gray-300">
-                    <li><strong>Abre la web:</strong> Ya estás aquí, figura.</li>
-                    <li><strong>Elige tu Luchador:</strong> Vete al <em>Baúl de Personas</em>. Si vas a usar Gemini, pilla el perfil "Gemini / Nube Tocha". Si vas con una tostadora local, pilla "Micro Modelos".</li>
-                    <li><strong>Simulador:</strong>
-                        <ul className="list-disc list-inside ml-4 mt-1 text-gray-400">
-                            <li><em>Modo Fake:</em> Si no tienes API Key, hace ver que curra (postureo).</li>
-                            <li><em>Modo Live:</em> Si metes la key en Configuración, curra de verdad.</li>
-                        </ul>
-                    </li>
-                    <li><strong>La Entrevista:</strong> Dile "Quiero un script en Python". El Tete te dirá: "¿Pa' qué versión? ¿Con qué librerías?". Tú contestas.</li>
-                    <li><strong>Exportar:</strong> Cuando termine, te dará un bloque de código. Lo copias y eso es tu <strong>Prompt Dorado</strong>.</li>
+                    <li>Arranca Ollama así: <code>OLLAMA_ORIGINS="*" ollama serve</code></li>
+                    <li>Vete a Configuración en esta App.</li>
+                    <li>Selecciona "OLLAMA" y dale al botón de refrescar modelos.</li>
+                    <li>Si te sale la lista, has triunfado.</li>
                 </ol>
-
-                <h2>3. Configuración (Pa' los Pros)</h2>
-                <p>Vete a la pestaña de la tuerca (Settings).</p>
-                <ul className="list-disc list-inside space-y-2 mb-4 text-gray-300">
-                    <li><strong>Gemini API:</strong> La nube de Google. Va como un tiro. Necesitas Key.</li>
-                    <li><strong>Ollama (Local):</strong> Pa' que nadie te espíe. <strong>OJO:</strong> Tienes que lanzarlo con <code>OLLAMA_ORIGINS="*" ollama serve</code> o el navegador te bloquea por CORS.</li>
-                    <li><strong>Temperatura:</strong> Baja (0.1) pa' código serio. Alta (0.8) pa' ideas locas.</li>
-                </ul>
-
-                <h2>4. Scripts y Actualizaciones</h2>
-                <p>El mundo de la IA va a toda leche. Pa' estar al día, usa los scripts de la sección <strong>Suministros</strong>:</p>
-                <ul className="list-disc list-inside space-y-2 mb-4 text-gray-300">
-                    <li><strong>Rastreador de Hype:</strong> Te dice qué modelos GGUF lo están petando en Hugging Face.</li>
-                    <li><strong>Sabueso de Gemini:</strong> Te chiva qué modelos nuevos ha sacado Google.</li>
-                </ul>
-                <p>Ejecutas el script en tu máquina, copias el JSON que te escupe y lo pegas en <em>Importar Knowledge Base</em> en Configuración.</p>
-
-                <h2>5. Modo Búnker (Offline)</h2>
-                <p>¿Eres un paranoico de la seguridad? Normal. Bájate el <strong>Empaquetador Búnker</strong> desde Suministros. Te crea una versión de esta web que funciona sin internet, con todas las librerías descargadas en local.</p>
             </div>
         );
 
-        // 3. Persona Vault
         const PersonaVault = () => {
             const [selectedModel, setSelectedModel] = useState('gemini');
             const [copied, setCopied] = useState(false);
-            const handleCopy = () => {
-                navigator.clipboard.writeText(PROMPTS[selectedModel].code);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            };
+            const handleCopy = () => { navigator.clipboard.writeText(PROMPTS[selectedModel].code); setCopied(true); setTimeout(() => setCopied(false), 2000); };
             return (
                 <div className="flex h-full">
                     <div className="w-48 bg-gray-900 border-r border-gray-800 pt-6">
                         <div className="px-4 mb-4 text-xs font-bold text-gray-500 uppercase">Motor Objetivo</div>
                         {Object.entries(PROMPTS).map(([key, data]) => (
-                            <button key={key} onClick={() => setSelectedModel(key)} className={`w-full text-left px-6 py-3 text-sm font-mono border-l-2 transition-all ${selectedModel === key ? 'border-purple-500 bg-gray-800 text-white' : 'border-transparent text-gray-500 hover:text-gray-300'}`}>
-                                {data.title}
-                            </button>
+                            <button key={key} onClick={() => setSelectedModel(key)} className={`w-full text-left px-6 py-3 text-sm font-mono border-l-2 transition-all ${selectedModel === key ? 'border-purple-500 bg-gray-800 text-white' : 'border-transparent text-gray-500 hover:text-gray-300'}`}>{data.title}</button>
                         ))}
                     </div>
                     <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -262,23 +205,39 @@
             );
         };
 
-        // 4. Settings View
+        // --- 4. SETTINGS VIEW (MEJORADO CON AUTO-FETCH OLLAMA) ---
         const SettingsView = ({ config, setConfig }) => {
             const [showKey, setShowKey] = useState(false);
-            const handleChange = (key, value) => {
-                setConfig(prev => {
-                    const next = { ...prev, [key]: value };
-                    const store = next.storage === 'local' ? localStorage : sessionStorage;
-                    store.setItem('prompt_architect_config', JSON.stringify(next));
-                    return next;
-                });
+            const [ollamaModels, setOllamaModels] = useState([]);
+            const [ollamaError, setOllamaError] = useState("");
+
+            // Fetch Ollama Models
+            const fetchModels = async () => {
+                setOllamaError("");
+                try {
+                    // Try fetch tags
+                    const res = await fetch(`${config.baseUrl}/api/tags`);
+                    if (!res.ok) throw new Error("No conecta. ¿CORS?");
+                    const data = await res.json();
+                    const models = data.models.map(m => m.name);
+                    setOllamaModels(models);
+                    // Auto-select first if current invalid
+                    if (models.length > 0 && !models.includes(config.model)) {
+                        handleChange('model', models[0]);
+                    }
+                } catch (e) {
+                    setOllamaModels([]);
+                    setOllamaError("No veo tu Ollama. Revisa OLLAMA_ORIGINS='*'");
+                }
             };
-            const clearData = () => {
-                localStorage.removeItem('prompt_architect_config');
-                sessionStorage.removeItem('prompt_architect_config');
-                setConfig(DEFAULT_CONFIG);
-                alert("Todo borrado, tete.");
-            };
+
+            // Auto-fetch when provider switches to ollama
+            useEffect(() => {
+                if (config.provider === 'ollama') fetchModels();
+            }, [config.provider, config.baseUrl]);
+
+            const handleChange = (key, value) => { setConfig(prev => { const next = { ...prev, [key]: value }; const store = next.storage === 'local' ? localStorage : sessionStorage; store.setItem('prompt_architect_config', JSON.stringify(next)); return next; }); };
+            const clearData = () => { localStorage.removeItem('prompt_architect_config'); sessionStorage.removeItem('prompt_architect_config'); setConfig(DEFAULT_CONFIG); alert("Todo borrado, tete."); };
 
             return (
                 <div className="p-8 max-w-4xl mx-auto h-full overflow-y-auto pb-24">
@@ -287,48 +246,60 @@
                         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
                             <h2 className="text-lg font-bold text-purple-300 mb-4 flex items-center"><i data-lucide="Server" className="w-5 h-5 mr-2"></i> Proveedor</h2>
                             <div className="grid grid-cols-3 gap-4 mb-6">
-                                {['gemini', 'ollama', 'custom'].map(p => (
-                                    <button key={p} onClick={() => handleChange('provider', p)} className={`py-3 rounded font-mono text-sm border ${config.provider === p ? 'bg-purple-900/30 border-purple-500 text-white' : 'bg-black border-gray-700 text-gray-500 hover:border-gray-500'}`}>{p.toUpperCase()}</button>
-                                ))}
+                                {['gemini', 'ollama', 'custom'].map(p => (<button key={p} onClick={() => handleChange('provider', p)} className={`py-3 rounded font-mono text-sm border ${config.provider === p ? 'bg-purple-900/30 border-purple-500 text-white' : 'bg-black border-gray-700 text-gray-500 hover:border-gray-500'}`}>{p.toUpperCase()}</button>))}
                             </div>
+                            
+                            {/* GEMINI UI */}
                             {config.provider === 'gemini' && (
                                 <div className="space-y-4 animate-in fade-in">
                                     <div><label className="block text-sm font-mono text-gray-400 mb-2">API KEY</label><div className="relative"><input type={showKey ? "text" : "password"} value={config.apiKey} onChange={(e) => handleChange('apiKey', e.target.value)} placeholder="AIzaSy..." className="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded outline-none font-mono"/><button onClick={() => setShowKey(!showKey)} className="absolute right-3 top-3 text-gray-500 hover:text-white"><i data-lucide={showKey ? "EyeOff" : "Eye"} className="w-5 h-5"></i></button></div></div>
+                                    <div><label className="block text-sm font-mono text-gray-400 mb-2">MODELO</label><select value={config.model} onChange={(e) => handleChange('model', e.target.value)} className="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded font-mono"><option value="gemini-2.5-flash-preview-09-2025">Gemini 2.5 Flash</option><option value="gemini-3.0-pro-exp">Gemini 3.0 Pro</option></select></div>
+                                </div>
+                            )}
+
+                            {/* OLLAMA UI (MEJORADO) */}
+                            {config.provider === 'ollama' && (
+                                <div className="space-y-4 animate-in fade-in">
+                                    <div className="bg-yellow-900/20 border border-yellow-900/50 p-3 rounded"><p className="text-xs text-yellow-200">¡AVISO! Pa' Ollama local: <code>OLLAMA_ORIGINS="*" ollama serve</code>.</p></div>
+                                    
                                     <div>
-                                        <label className="block text-sm font-mono text-gray-400 mb-2">MODEL ID</label>
-                                        <select value={config.model} onChange={(e) => handleChange('model', e.target.value)} className="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded focus:border-purple-500 outline-none font-mono">
-                                            <optgroup label="Gemini 3 (Nueva Gen)">
-                                                <option value="gemini-3.0-pro-exp">gemini-3.0-pro-exp</option>
-                                            </optgroup>
-                                            <optgroup label="Gemini 2.5 (Estándar)">
-                                                <option value="gemini-2.5-flash-preview-09-2025">gemini-2.5-flash-preview (Recomendado)</option>
-                                                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
-                                            </optgroup>
-                                        </select>
+                                        <label className="block text-sm font-mono text-gray-400 mb-2">URL BASE</label>
+                                        <div className="flex gap-2">
+                                            <input type="text" value={config.baseUrl} onChange={(e) => handleChange('baseUrl', e.target.value)} className="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded outline-none font-mono"/>
+                                            <button onClick={fetchModels} className="bg-gray-800 px-4 rounded text-white hover:bg-gray-700"><i data-lucide="RefreshCw" className="w-4 h-4"></i></button>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-mono text-gray-400 mb-2">MODELO INSTALADO</label>
+                                        {ollamaModels.length > 0 ? (
+                                            <select value={config.model} onChange={(e) => handleChange('model', e.target.value)} className="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded font-mono focus:border-purple-500">
+                                                {ollamaModels.map(m => <option key={m} value={m}>{m}</option>)}
+                                            </select>
+                                        ) : (
+                                            <div className="text-red-400 text-xs font-mono border border-red-900 p-2 rounded">
+                                                {ollamaError || "Buscando modelos..."}
+                                                <br/>Intenta: <code>ollama pull llama3</code>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}
-                            {(config.provider === 'ollama' || config.provider === 'custom') && (
+
+                            {/* CUSTOM UI */}
+                            {config.provider === 'custom' && (
                                 <div className="space-y-4 animate-in fade-in">
-                                    <div className="bg-yellow-900/20 border border-yellow-900/50 p-3 rounded"><p className="text-xs text-yellow-200">Usa <code>OLLAMA_ORIGINS="*"</code>.</p></div>
                                     <div><label className="block text-sm font-mono text-gray-400 mb-2">URL</label><input type="text" value={config.baseUrl} onChange={(e) => handleChange('baseUrl', e.target.value)} className="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded outline-none font-mono"/></div>
+                                    <div><label className="block text-sm font-mono text-gray-400 mb-2">MODELO (TEXTO)</label><input type="text" value={config.model} onChange={(e) => handleChange('model', e.target.value)} className="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded outline-none font-mono"/></div>
                                 </div>
                             )}
                         </div>
-                        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                            <h2 className="text-lg font-bold text-purple-300 mb-4"><i data-lucide="Database" className="w-5 h-5 mr-2 inline"></i> Importar Knowledge Base</h2>
-                            <textarea value={config.externalKnowledge} onChange={(e) => handleChange('externalKnowledge', e.target.value)} placeholder='Pegar JSON aquí...' className="w-full h-32 bg-black border border-gray-700 text-gentoo-code text-xs p-3 rounded font-mono outline-none"></textarea>
-                        </div>
-                        <div className="border border-red-900/30 rounded-xl p-6 flex justify-between items-center">
-                            <p className="text-sm text-red-400">Borrar datos locales</p>
-                            <button onClick={clearData} className="bg-red-900/20 hover:bg-red-900/50 text-red-400 border border-red-900 px-4 py-2 rounded font-mono text-sm">BORRAR TODO</button>
-                        </div>
+                        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6"><h2 className="text-lg font-bold text-purple-300 mb-4"><i data-lucide="Database" className="w-5 h-5 mr-2 inline"></i> Importar Knowledge Base</h2><textarea value={config.externalKnowledge} onChange={(e) => handleChange('externalKnowledge', e.target.value)} placeholder='Pegar JSON aquí...' className="w-full h-32 bg-black border border-gray-700 text-gentoo-code text-xs p-3 rounded font-mono outline-none"></textarea></div>
                     </div>
                 </div>
             );
         };
 
-        // 5. Simulator
         const Simulator = ({ config }) => {
             const [history, setHistory] = useState([]);
             const [input, setInput] = useState("");
@@ -338,7 +309,7 @@
             const bottomRef = useRef(null);
 
             useEffect(() => {
-                const modeLabel = config.provider === 'gemini' ? (config.apiKey ? "LIVE" : "MOCK") : "LIVE (" + config.provider.toUpperCase() + ")";
+                const modeLabel = config.provider === 'gemini' ? (config.apiKey ? "LIVE (Gemini)" : "MOCK") : "LIVE (" + config.provider.toUpperCase() + ")";
                 if (history.length === 0) setHistory([{ sender: 'system', text: `Persona: ${PROMPTS[activePersona].title}\nModo: ${modeLabel}\nEsperando chicha...` }]);
             }, [activePersona, config, modality]);
 
@@ -364,22 +335,35 @@
                         if (data.error) throw new Error(data.error.message);
                         return data.candidates[0].content.parts[0].text;
                     } else {
-                        const payload = { model: config.model, messages: [{ role: 'system', content: sysInstruct }, ...messages], stream: false, options: { temperature: config.temperature } };
+                        // OLLAMA / CUSTOM LOGIC
+                        const payload = { 
+                            model: config.model, // AHORA SÍ PILLA EL MODELO DEL SELECT
+                            messages: [{ role: 'system', content: sysInstruct }, ...messages], 
+                            stream: false, 
+                            options: { temperature: config.temperature } 
+                        };
                         const endpoint = config.provider === 'ollama' ? `${config.baseUrl}/api/chat` : `${config.baseUrl}/chat/completions`;
+                        
                         const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        if (!response.ok) {
+                            if (response.status === 404) throw new Error(`404: El modelo '${config.model}' no existe en tu Ollama. Haz 'ollama pull ${config.model}'.`);
+                            throw new Error(`HTTP Error ${response.status}`);
+                        }
+                        
                         const data = await response.json();
                         if (data.message) return data.message.content;
                         if (data.choices) return data.choices[0].message.content;
-                        return "Error: Respuesta desconocida, tete.";
+                        return "Error: Respuesta desconocida.";
                     }
-                } catch (e) { return `Error: ${e.message}`; }
+                } catch (e) { 
+                    return `[ERROR DE CONEXIÓN]\n${e.message}\n\nTip: Revisa la consola (F12) o los ajustes.`; 
+                }
             };
 
             const handleSend = async () => {
                 if (!input.trim() || isLoading) return;
                 const userMsg = input;
-                const newHistory = [...history, { sender: 'user', text: userMsg }];
-                setHistory(newHistory);
+                setHistory(prev => [...prev, { sender: 'user', text: userMsg }]);
                 setInput("");
                 setIsLoading(true);
 
@@ -397,15 +381,7 @@
                     <div className="p-4 border-b border-gray-800 bg-gray-900/50 flex justify-between items-center">
                         <div className="flex items-center space-x-4">
                             <span className="text-gray-400 text-sm font-mono">PERSONA:</span>
-                            <select value={activePersona} onChange={(e) => { setActivePersona(e.target.value); setHistory([]); }} className="bg-black border border-gray-700 text-white text-sm rounded px-2 py-1 font-mono outline-none">
-                                {Object.keys(PROMPTS).map(k => <option key={k} value={k}>{PROMPTS[k].title}</option>)}
-                            </select>
-                            <span className="text-gray-400 text-sm font-mono ml-4">OBJETIVO:</span>
-                            <select value={modality} onChange={(e) => { setModality(e.target.value); setHistory([]); }} className="bg-black border border-gray-700 text-yellow-400 text-sm rounded px-2 py-1 font-mono outline-none">
-                                <option value="text">Texto (General)</option>
-                                <option value="image">Imagen (GenAI)</option>
-                                <option value="code">Código / Script</option>
-                            </select>
+                            <select value={activePersona} onChange={(e) => { setActivePersona(e.target.value); setHistory([]); }} className="bg-black border border-gray-700 text-white text-sm rounded px-2 py-1 font-mono outline-none">{Object.keys(PROMPTS).map(k => <option key={k} value={k}>{PROMPTS[k].title}</option>)}</select>
                         </div>
                         <div className="text-xs font-mono text-gray-500">MODO {config.provider.toUpperCase()}</div>
                     </div>
@@ -418,6 +394,7 @@
                                 </div>
                             </div>
                         ))}
+                        {isLoading && <div className="text-purple-400 font-mono text-sm animate-pulse">Cocinando...</div>}
                         <div ref={bottomRef}></div>
                     </div>
                     <div className="p-4 bg-gray-900 border-t border-gray-800 flex space-x-2">
@@ -428,30 +405,22 @@
             );
         };
 
-        // 6. Assistant View
         const AssistantView = ({ config }) => {
              const [query, setQuery] = useState("");
              const [kb, setKb] = useState(DEFAULT_KB);
-             useEffect(() => {
-                 if (config.externalKnowledge) {
-                     try { const external = JSON.parse(config.externalKnowledge); if (external.data) setKb([...DEFAULT_KB, ...external.data]); } catch (e) {}
-                 }
-             }, [config.externalKnowledge]);
+             useEffect(() => { if (config.externalKnowledge) { try { const external = JSON.parse(config.externalKnowledge); if (external.data) setKb([...DEFAULT_KB, ...external.data]); } catch (e) {} } }, [config.externalKnowledge]);
             const results = query ? kb.filter(k => k.keyword.toLowerCase().includes(query.toLowerCase())) : kb;
             return (
                 <div className="p-8 max-w-4xl mx-auto h-full flex flex-col">
                     <h1 className="text-2xl font-bold text-white mb-2">Asistente</h1>
                     <input type="text" placeholder="Buscar..." value={query} onChange={(e) => setQuery(e.target.value)} className="w-full bg-gray-900 border border-gray-700 text-white px-4 py-3 rounded mb-6 outline-none font-mono" />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto pb-12">
-                        {results.map((item, idx) => (
-                            <div key={idx} className="bg-gray-900/50 border border-gray-800 p-6 rounded-lg"><h3 className="text-lg font-bold text-purple-300 mb-2 truncate">{item.title}</h3><p className="text-gray-400 text-sm">{item.text}</p></div>
-                        ))}
+                        {results.map((item, idx) => (<div key={idx} className="bg-gray-900/50 border border-gray-800 p-6 rounded-lg"><h3 className="text-lg font-bold text-purple-300 mb-2 truncate">{item.title}</h3><p className="text-gray-400 text-sm">{item.text}</p></div>))}
                     </div>
                 </div>
             );
         };
 
-        // 7. DOWNLOADS VIEW
         const DownloadsView = () => {
             const downloadFile = (filename, content, type) => {
                 const mimeType = type === 'json' ? 'application/json' : 'text/plain';
@@ -465,34 +434,20 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             };
-
             return (
                 <div className="p-8 max-w-4xl mx-auto h-full overflow-y-auto pb-24">
-                    <h1 className="text-3xl font-bold text-white mb-2">Zona de Suministros</h1>
-                    <p className="text-gray-400 mb-8">Píllate todo el material pa' llevártelo a casa.</p>
-
+                    <h1 className="text-3xl font-bold text-white mb-2">Suministros (Full Version)</h1>
+                    <p className="text-gray-400 mb-8">Ahora sí, los archivos completos, tete.</p>
                     <div className="grid grid-cols-1 gap-6">
                         {DOWNLOADS_CATALOG.map((item) => (
                             <div key={item.id} className="bg-gray-900/50 border border-gray-800 p-6 rounded-xl flex items-center justify-between hover:border-purple-500/50 transition-colors group">
                                 <div className="flex items-center space-x-4">
                                     <div className={`p-3 rounded-lg ${item.type === 'python' ? 'bg-blue-900/20 text-blue-400' : item.type === 'json' ? 'bg-yellow-900/20 text-yellow-400' : 'bg-green-900/20 text-green-400'}`}>
-                                        {item.type === 'python' ? <i data-lucide="FileCode" className="w-6 h-6"></i> : 
-                                         item.type === 'json' ? <i data-lucide="FileJson" className="w-6 h-6"></i> : 
-                                         <i data-lucide="FileText" className="w-6 h-6"></i>}
+                                        {item.type === 'python' ? <i data-lucide="FileCode" className="w-6 h-6"></i> : item.type === 'json' ? <i data-lucide="FileJson" className="w-6 h-6"></i> : <i data-lucide="FileText" className="w-6 h-6"></i>}
                                     </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">{item.title}</h3>
-                                        <div className="text-xs font-mono text-gray-500 mb-1">{item.file}</div>
-                                        <p className="text-sm text-gray-400">{item.desc}</p>
-                                    </div>
+                                    <div><h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">{item.title}</h3><div className="text-xs font-mono text-gray-500 mb-1">{item.file}</div></div>
                                 </div>
-                                <button 
-                                    onClick={() => downloadFile(item.file, FILE_CONTENTS[item.id], item.type)}
-                                    className="bg-black border border-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-mono text-sm flex items-center space-x-2 transition-all active:scale-95"
-                                >
-                                    <i data-lucide="Download" className="w-4 h-4"></i>
-                                    <span>BAJAR</span>
-                                </button>
+                                <button onClick={() => downloadFile(item.file, FILE_CONTENTS[item.id], item.type)} className="bg-black border border-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-mono text-sm flex items-center space-x-2 transition-all active:scale-95"><i data-lucide="Download" className="w-4 h-4"></i><span>BAJAR</span></button>
                             </div>
                         ))}
                     </div>
@@ -500,11 +455,9 @@
             );
         };
 
-        // --- MAIN APP ---
         const App = () => {
             const [activeTab, setActiveTab] = useState('manual');
             const [config, setConfig] = useState(DEFAULT_CONFIG);
-
             useEffect(() => {
                 const local = localStorage.getItem('prompt_architect_config');
                 const session = sessionStorage.getItem('prompt_architect_config');
@@ -512,9 +465,7 @@
                 else if (session) setConfig(JSON.parse(session));
                 lucide.createIcons();
             }, []);
-
             useEffect(() => { lucide.createIcons(); }, [activeTab]);
-
             return (
                 <div className="flex h-screen w-screen overflow-hidden font-sans bg-gentoo-bg text-gentoo-text">
                     <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
