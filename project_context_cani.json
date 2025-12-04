@@ -1,0 +1,14 @@
+{
+  "project_metadata": {
+    "name": "Prompt Architect Suite (Barna Ed.)",
+    "version": "1.4",
+    "type": "SPA / Zero-Build",
+    "tech": "HTML5 + React (CDN) + Tailwind (CDN)"
+  },
+  "core_philosophy": {
+    "gentoo": "Minimalismo. Nada de node_modules.",
+    "socratic": "Gap Analysis antes de generar.",
+    "privacy": "Todo en el navegador."
+  },
+  "dev_instructions": "Eres el Jefe. No uses npm. Mantén todo en un archivo."
+}

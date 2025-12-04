@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot: La Suite del Arquitecto (60s PLATINUM)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: #000; overflow: hidden; font-family: 'Inter', sans-serif; }
+        .neon-text { text-shadow: 0 0 10px #a78bfa, 0 0 30px #7c3aed, 0 0 60px #4c1d95; }
+        .neon-red { text-shadow: 0 0 10px #f87171, 0 0 40px #ef4444, 0 0 80px #7f1d1d; }
+        .neon-gold { text-shadow: 0 0 20px #facc15, 0 0 40px #eab308, 0 0 80px #854d0e; }
+        .glitch { position: relative; }
+        .glitch::before, .glitch::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8; }
+        .glitch::before { left: 4px; text-shadow: -3px 0 #ff00c1; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 0.2s infinite linear alternate-reverse; }
+        .glitch::after { left: -4px; text-shadow: -3px 0 #00fff9; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 0.3s infinite linear alternate-reverse; }
+        @keyframes glitch-anim { 0% { clip: rect(30px, 9999px, 10px, 0); } 100% { clip: rect(20px, 9999px, 60px, 0); } }
+        @keyframes glitch-anim2 { 0% { clip: rect(10px, 9999px, 80px, 0); } 100% { clip: rect(50px, 9999px, 80px, 0); } }
+        @keyframes shake-violent { 0% { transform: translate(0, 0) rotate(0); } 20% { transform: translate(5px, 5px) rotate(5deg); } 100% { transform: translate(0, 0) rotate(0); } }
+        @keyframes heartbeat-extreme { 0% { transform: scale(1); } 20% { transform: scale(1.4); } 100% { transform: scale(1); } }
+        @keyframes flash-white { 0% { opacity: 0; } 10% { opacity: 1; background: white; } 100% { opacity: 0; } }
+        @keyframes dramaticZoom { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes spin-slow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .scene { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.1s ease-in-out; background-size: cover; background-position: center; overflow: hidden; }
+        .active { opacity: 1; pointer-events: auto; }
+        .shake-element { animation: shake-violent 0.2s infinite; }
+        .heartbeat-element { animation: heartbeat-extreme 0.8s infinite; }
+        .float-element { animation: float 3s ease-in-out infinite; }
+        .bg-grid { background-image: linear-gradient(rgba(50, 50, 50, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(50, 50, 50, 0.5) 1px, transparent 1px); background-size: 60px 60px; }
+    </style>
+</head>
+<body>
+    <div id="video-container" class="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center font-sans">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 z-10 pointer-events-none"></div>
+        <div class="absolute inset-0 z-[100] pointer-events-none opacity-0" id="flash-overlay" style="background: white;"></div>
+        <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-red-600 via-yellow-500 to-green-500 z-50 shadow-[0_0_30px_#a78bfa]" id="progress-bar" style="width: 0%"></div>
+
+        <!-- 1. 0s-4s: WAKE UP -->
+        <div id="scene-1" class="scene active bg-black">
+            <h1 class="text-8xl md:text-[10rem] font-black text-green-500 mb-4 font-mono glitch tracking-tighter leading-none" data-text="WAKE UP">WAKE<br>UP</h1>
+            <p class="text-xl md:text-3xl text-green-400 font-mono mt-4 opacity-0" id="s1-t1">> LA MATRIX TE ESTÁ TOMANDO EL PELO... <span class="animate-pulse">_</span></p>
+        </div>
+
+        <!-- 2. 4s-9s: BASURA -->
+        <div id="scene-2" class="scene bg-black bg-grid">
+            <div class="relative z-10 text-center">
+                <h2 class="text-5xl text-white font-bold mb-2 uppercase italic transform -skew-x-12">¿Tus Prompts?</h2>
+                <h1 class="text-9xl font-black text-white bg-red-600 px-12 py-4 neon-red glitch transform rotate-2" data-text="BASURA">BASURA</h1>
+                <div class="mt-8 flex flex-col gap-2 opacity-0 font-mono text-xl" id="s2-list">
+                    <span class="bg-black text-red-500 border border-red-500 px-2">❌ ALUCINACIONES</span>
+                    <span class="bg-black text-red-500 border border-red-500 px-2">❌ CÓDIGO ROTO</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 9s-14s: DOLOR -->
+        <div id="scene-2b" class="scene bg-neutral-900">
+            <i data-lucide="Skull" class="w-48 h-48 text-gray-700 absolute opacity-20 animate-pulse"></i>
+            <div class="z-10 text-center">
+                <h1 class="text-6xl font-black text-white mb-8 shake-element">TE VA A PETAR</h1>
+                <div class="flex justify-center gap-8 mb-8">
+                    <div class="bg-red-900 text-red-200 p-4 rounded-xl border-2 border-red-500 transform -rotate-3 scale-0 w-40 flex flex-col items-center justify-center" id="s2b-1"><i data-lucide="Brain" class="w-16 h-16 mb-2 text-red-300"></i><span class="font-bold">CEREBRO</span></div>
+                    <div class="bg-red-900 text-red-200 p-4 rounded-xl border-2 border-red-500 transform rotate-3 scale-0 delay-100 w-40 flex flex-col items-center justify-center" id="s2b-2"><i data-lucide="Hourglass" class="w-16 h-16 mb-2 text-red-300"></i><span class="font-bold">TIEMPO</span></div>
+                </div>
+                <p class="text-3xl text-red-500 font-black bg-black px-4 py-1 transform rotate-2 opacity-0 neon-red" id="s2b-extra">TU JEFE TE VA A CANEAR</p>
+            </div>
+        </div>
+
+        <!-- 4. 14s-21s: ERES TU -->
+        <div id="scene-3" class="scene bg-black">
+            <div class="text-center z-20 space-y-4">
+                <h2 class="text-5xl font-black text-gray-500 opacity-0 transform translate-y-10" id="s3-t1">ESCUCHA, TETE...</h2>
+                <div class="opacity-0 transform scale-50" id="s3-main"><h1 class="text-7xl font-black text-white">NO ES LA IA</h1><h1 class="text-[10rem] font-black text-red-600 neon-red leading-none glitch" data-text="ERES TÚ">ERES TÚ</h1></div>
+                <div class="flex flex-col gap-4 mt-8 relative">
+                    <p class="text-3xl text-white font-bold bg-red-600 inline-block px-6 py-2 transform -rotate-2 opacity-0" id="s3-insult1">TUS PROMPTS DAN PENA</p>
+                    <p class="text-3xl text-black font-bold bg-white inline-block px-6 py-2 transform rotate-1 opacity-0" id="s3-insult2">NO SABES ESCRIBIR</p>
+                    <p class="text-4xl text-yellow-400 font-black inline-block px-6 py-2 transform -rotate-3 opacity-0 neon-gold" id="s3-insult3">¡ERES UN BOOMER!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 21s-27s: LA SUITE -->
+        <div id="scene-4" class="scene bg-purple-900">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30"></div>
+            <div class="text-center relative z-10" style="animation: dramaticZoom 0.5s ease-out forwards">
+                <p class="text-cyan-300 font-mono tracking-[0.5em] text-xl mb-4 animate-pulse">INSTALLING SKILLS.EXE...</p>
+                <h1 class="text-8xl font-black text-white mb-2 drop-shadow-2xl">LA SUITE</h1>
+                <h1 class="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-200 mb-8 neon-text">DEL ARQUITECTO</h1>
+                <div class="inline-block bg-black border-2 border-cyan-400 text-cyan-400 px-4 py-1 font-mono text-xl rounded opacity-0" id="s4-tags">BARNA EDITION v1.4</div>
+            </div>
+        </div>
+
+        <!-- 6. 27s-33s: ARSENAL -->
+        <div id="scene-5" class="scene bg-black">
+            <div class="flex flex-col w-full max-w-5xl px-8 gap-4">
+                <div class="bg-gray-900 border-l-8 border-yellow-400 p-6 flex flex-row items-center transform translate-x-full transition-transform duration-200" id="s5-c1"><div class="mr-6 shrink-0"><i data-lucide="HelpCircle" class="w-16 h-16 text-yellow-400 heartbeat-element"></i></div><div><span class="text-yellow-600 font-mono text-xl font-bold block mb-1">&gt;_ INPUT_REQ</span><h3 class="text-yellow-400 font-black text-5xl">TE INTERROGA</h3></div></div>
+                <div class="bg-gray-900 border-l-8 border-cyan-400 p-6 flex flex-row items-center transform translate-x-full transition-transform duration-200" id="s5-c2"><div class="mr-6 shrink-0"><i data-lucide="Cpu" class="w-16 h-16 text-cyan-400 heartbeat-element"></i></div><div><span class="text-cyan-600 font-mono text-xl font-bold block mb-1">&gt;_ PARSING...</span><h3 class="text-cyan-400 font-black text-5xl">TE ENTIENDE</h3></div></div>
+                <div class="bg-gray-900 border-l-8 border-green-500 p-6 flex flex-row items-center transform translate-x-full transition-transform duration-200" id="s5-c3"><div class="mr-6 shrink-0"><i data-lucide="Zap" class="w-16 h-16 text-green-500 heartbeat-element"></i></div><div><span class="text-green-600 font-mono text-xl font-bold block mb-1">&gt;_ SUCCESS</span><h3 class="text-green-500 font-black text-5xl">TE SOLUCIONA</h3></div></div>
+            </div>
+        </div>
+
+        <!-- 7. 33s-39s: BUNKER -->
+        <div id="scene-5b" class="scene bg-gray-900">
+            <div class="absolute inset-0 bg-green-900/20"></div>
+            <div class="text-center z-10"><div class="border-8 border-green-500 rounded-full p-8 inline-block mb-6 bg-black shadow-[0_0_50px_#22c55e] animate-pulse"><i data-lucide="ShieldCheck" class="w-32 h-32 text-green-500"></i></div><h1 class="text-7xl font-black text-white mb-2 glitch" data-text="MODO BÚNKER">MODO BÚNKER</h1><p class="text-3xl text-gray-400 font-mono mt-4 opacity-0" id="s5b-t">> 100% OFFLINE. SIN ESPÍAS.</p></div>
+        </div>
+
+        <!-- 8. 39s-45s: LEVEL UP -->
+        <div id="scene-6" class="scene bg-black overflow-visible">
+            <div id="s6-phase1" class="absolute inset-0 flex flex-col items-center justify-center transition-all duration-200"><i data-lucide="UserMinus" class="w-48 h-48 text-gray-500 mb-4 opacity-50"></i><h2 class="text-6xl font-black text-gray-600 line-through decoration-red-600 decoration-8">NPC BASURILLA</h2></div>
+            <div id="s6-phase2" class="absolute inset-0 flex flex-col items-center justify-center scale-0 opacity-0 transition-all duration-700"><div class="absolute w-[800px] h-[800px] bg-gradient-to-r from-yellow-500 via-transparent to-yellow-500 opacity-20 animate-[spin-slow_10s_linear_infinite] rounded-full blur-3xl"></div><i data-lucide="Crown" class="w-64 h-64 text-yellow-300 drop-shadow-[0_0_50px_#facc15] float-element relative z-10"></i><h1 class="text-[10rem] font-black text-white mt-8 neon-gold leading-none glitch z-20" data-text="ADMIN">ADMIN</h1><div class="bg-yellow-500 text-black font-black text-2xl px-4 py-1 mt-4 transform rotate-1 z-20">NIVEL DIOS ACTIVADO</div></div>
+        </div>
+
+        <!-- 9. 45s-53s: SIN TONTERIAS -->
+        <div id="scene-6b" class="scene bg-blue-950">
+            <div class="text-center z-10"><h2 class="text-4xl text-blue-300 font-mono mb-8 uppercase tracking-widest border-b-2 border-blue-500 inline-block pb-2">Filosofía Gentoo</h2><div class="grid grid-cols-2 gap-12 text-left"><div class="opacity-0 transition-opacity duration-300 transform -translate-x-10" id="s6b-1"><h1 class="text-8xl font-black text-white">40KB</h1><p class="text-xl text-gray-300 font-bold">DE HTML PURO</p></div><div class="opacity-0 transition-opacity duration-300 transform translate-x-10 delay-200" id="s6b-2"><h1 class="text-8xl font-black text-white">0%</h1><p class="text-xl text-gray-300 font-bold">TRACKING / BS</p></div></div></div>
+        </div>
+
+        <!-- 10. 53s-60s: FINAL -->
+        <div id="scene-7" class="scene bg-black">
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900 via-black to-black opacity-50"></div>
+            <div class="text-center z-10 w-full relative">
+                <p class="text-purple-400 font-mono mb-4 text-2xl animate-bounce font-bold">¿A QUÉ ESPERAS, TETE?</p>
+                <h1 class="text-8xl md:text-[8rem] font-black text-white mb-10 neon-text glitch" data-text="PÍLLATELA">PÍLLATELA</h1>
+                <div class="flex flex-col items-center gap-8">
+                    <a href="./prompt_architect_app_cani.html" target="_blank" class="bg-white text-black font-black text-5xl px-20 py-8 transform -rotate-1 hover:rotate-0 hover:scale-110 transition-all cursor-pointer border-8 border-purple-600 shadow-[0_0_80px_#9333ea] hover:shadow-[0_0_120px_#9333ea] inline-block no-underline heartbeat-element">DALE CAÑA (ABRIR)</a>
+                </div>
+            </div>
+            <div class="absolute bottom-10 z-40 w-full text-center"><div class="inline-block bg-black/90 border-2 border-purple-500 px-8 py-4 rounded-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transform hover:scale-105 transition-transform"><p class="text-gray-400 font-mono text-sm mb-1 uppercase tracking-widest">Una producción de</p><h2 class="text-3xl font-black text-white neon-text">KERNEL PANIC PROD</h2><p class="text-purple-400 text-xs italic mt-1">"Edición Gen Z: Pura Poesía de Barrio"</p></div></div>
+            <button id="replay-btn" class="absolute top-10 right-10 bg-white/10 backdrop-blur text-white p-4 rounded-full hover:bg-white/20 hidden z-50 border border-white/20 transition-all hover:scale-110"><i data-lucide="RotateCcw" class="w-8 h-8"></i></button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        const scenes = [1,2,'2b',3,4,5,'5b',6,'6b',7].map(id => document.getElementById('scene-'+id));
+        const progressBar = document.getElementById('progress-bar');
+        const replayBtn = document.getElementById('replay-btn');
+        const flashOverlay = document.getElementById('flash-overlay');
+
+        function triggerFlash() { flashOverlay.style.animation = 'flash-white 0.2s ease-out forwards'; setTimeout(() => { flashOverlay.style.animation = 'none'; }, 200); }
+        function switchScene(index) { scenes.forEach(s => s.classList.remove('active')); scenes[index].classList.add('active'); }
+        function resetAnimations() {
+            // Hard reset of all animation classes
+            const els = document.querySelectorAll('*');
+            els.forEach(el => {
+                el.classList.remove('opacity-100', 'scale-100', 'translate-x-0', 'translate-y-0');
+                if(el.id.includes('s3-insult')) el.classList.remove('opacity-100');
+            });
+            document.getElementById('s1-t1').classList.add('opacity-0');
+            document.getElementById('s2-list').classList.add('opacity-0');
+            document.getElementById('s2b-1').classList.add('scale-0'); document.getElementById('s2b-2').classList.add('scale-0'); document.getElementById('s2b-extra').classList.add('opacity-0');
+            document.getElementById('s3-t1').classList.add('opacity-0', 'translate-y-10'); document.getElementById('s3-main').classList.add('opacity-0', 'scale-50'); document.getElementById('s3-insult1').classList.add('opacity-0'); document.getElementById('s3-insult2').classList.add('opacity-0'); document.getElementById('s3-insult3').classList.add('opacity-0');
+            document.getElementById('s4-tags').classList.add('opacity-0');
+            ['s5-c1','s5-c2','s5-c3'].forEach(id => document.getElementById(id).classList.add('translate-x-full'));
+            document.getElementById('s5b-t').classList.add('opacity-0');
+            document.getElementById('s6-phase1').classList.remove('opacity-0', 'shake-element'); document.getElementById('s6-phase1').classList.add('opacity-100');
+            document.getElementById('s6-phase2').classList.remove('scale-100', 'opacity-100'); document.getElementById('s6-phase2').classList.add('scale-0', 'opacity-0');
+            document.getElementById('s6b-1').classList.add('opacity-0', '-translate-x-10'); document.getElementById('s6b-2').classList.add('opacity-0', 'translate-x-10');
+        }
+
+        function playVideo() {
+            resetAnimations(); replayBtn.classList.add('hidden'); progressBar.style.transition = 'none'; progressBar.style.width = '0%'; void progressBar.offsetWidth;
+            progressBar.style.transition = 'width 60s linear'; progressBar.style.width = '100%';
+
+            switchScene(0); setTimeout(() => document.getElementById('s1-t1').classList.remove('opacity-0'), 1500);
+            
+            setTimeout(() => { switchScene(1); setTimeout(() => document.getElementById('s2-list').classList.remove('opacity-0'), 1000); }, 4000);
+            
+            setTimeout(() => { switchScene(2); setTimeout(() => document.getElementById('s2b-1').classList.remove('scale-0'), 500); setTimeout(() => document.getElementById('s2b-2').classList.remove('scale-0'), 1500); setTimeout(() => document.getElementById('s2b-extra').classList.remove('opacity-0'), 3000); }, 9000);
+            
+            setTimeout(() => { switchScene(3); setTimeout(() => document.getElementById('s3-t1').classList.remove('opacity-0', 'translate-y-10'), 500); setTimeout(() => { document.getElementById('s3-main').classList.remove('opacity-0', 'scale-50'); triggerFlash(); }, 2000); setTimeout(() => document.getElementById('s3-insult1').classList.remove('opacity-0'), 4000); setTimeout(() => document.getElementById('s3-insult2').classList.remove('opacity-0'), 5500); setTimeout(() => document.getElementById('s3-insult3').classList.remove('opacity-0'), 6500); }, 14000);
+            
+            setTimeout(() => { switchScene(4); setTimeout(() => document.getElementById('s4-tags').classList.remove('opacity-0'), 2500); }, 21000);
+            
+            setTimeout(() => { switchScene(5); ['s5-c1', 's5-c2', 's5-c3'].forEach((id, idx) => setTimeout(() => document.getElementById(id).classList.remove('translate-x-full'), idx * 1000)); }, 27000);
+            
+            setTimeout(() => { switchScene(6); setTimeout(() => document.getElementById('s5b-t').classList.remove('opacity-0'), 1500); }, 33000);
+            
+            setTimeout(() => { switchScene(7); setTimeout(() => document.getElementById('s6-phase1').classList.add('shake-element'), 1000); setTimeout(() => { triggerFlash(); document.getElementById('s6-phase1').classList.add('opacity-0'); document.getElementById('s6-phase2').classList.remove('scale-0', 'opacity-0'); }, 3000); }, 39000);
+            
+            setTimeout(() => { switchScene(8); setTimeout(() => { document.getElementById('s6b-1').classList.remove('opacity-0', '-translate-x-10'); document.getElementById('s6b-2').classList.remove('opacity-0', 'translate-x-10'); }, 500); }, 45000);
+            
+            setTimeout(() => { switchScene(9); triggerFlash(); }, 53000);
+            
+            setTimeout(() => { replayBtn.classList.remove('hidden'); }, 60000);
+        }
+        window.onload = playVideo; replayBtn.onclick = playVideo;
+    </script>
+</body>
+</html>
